@@ -12,6 +12,8 @@
 # OK: add game weight
 # OK: Add price
 # TODO: write to json file (for later analysis)
+# TODO: add variable here for number of games
+# TODO: add info about needed Google Drive secret file
 
 
 def main():
