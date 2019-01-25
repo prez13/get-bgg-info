@@ -2,8 +2,7 @@
 
 # Caching
 # OK: Move cache files to cache sub folder
-# OK: Add possibi
-# lity to choose if cache should be used
+# OK: Add possibility to choose if cache should be used
 # TODO: Cache browse pages
 #
 # Attributes:
@@ -11,7 +10,7 @@
 # OK: Resolve "2, " number of players issue
 # TODO: Move attribute queries into separate functions
 # OK: add game weight
-# TODO: Add price
+# OK: Add price
 # TODO: write to json file (for later analysis)
 
 
