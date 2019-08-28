@@ -52,6 +52,7 @@ class BGG:
                               'price_amazon_new': 'Price Amz new',
                               'price_ios':'Price iOS',
                               'all_time_plays':'Plays all',
+                              'fans' : 'Fans',
                               }
     google_sheet_col_order = [
         'Rank',
@@ -62,6 +63,7 @@ class BGG:
         'Geek rating',
         'Num voters',
         'Plays all',
+        'Fans',
         'Num pl comm',
         'Num pl comm best',
         'Pl time min',
@@ -377,12 +379,19 @@ class BGG:
         d = {}
         soup = bs4.BeautifulSoup(html_text, "lxml")
 
-        #import pdb; pdb.set_trace()
+        import pdb; pdb.set_trace()
 
+        # ALl time plays
         try:
             d['all_time_plays'] = soup.findAll("a", {"ng-href" : f"/playstats/thing/{game_id}"})[0].getText().replace(',','')
         except:
             d['all_time_plays'] = 'Could not get'
+
+        # Fans
+        try:
+            d['fans'] = soup.findAll("a", {"href" : f"/fans/thing/{game_id}"})[2].getText().replace(",", "")
+        except:
+            d['fans'] = 'Could not get'
 
         print(d)
         return d
