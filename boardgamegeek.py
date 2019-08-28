@@ -41,6 +41,7 @@ class BGG:
                               'price_amazon_lowest': 'Price Amz lowest',
                               'price_amazon_new': 'Price Amz new',
                               'price_ios':'Price iOS',
+                              'all_time_plays':'Plays all',
                               }
     google_sheet_col_order = [
         'Rank',
@@ -50,6 +51,7 @@ class BGG:
         'Avg rating',
         'Geek rating',
         'Num voters',
+        'Plays all',
         'Num pl comm',
         'Num pl comm best',
         'Pl time min',
@@ -318,6 +320,11 @@ class BGG:
 
             d_attributes = self.get_attributes(page_content)
             d_attributes.update(game)  # add id, title, and title_url to dict (game is dict, too)
+
+            # NEW: get stats (e.g. all time plays)
+            d_stats = self.get_stats(boardgame_url, game['id'])
+            d_attributes.update(d_stats)
+
             l_d.append(d_attributes)
 
             counter += 1
@@ -325,6 +332,50 @@ class BGG:
         #browser.quit()
 
         return l_d
+
+
+    def get_stats(self, boardgame_url, game_id):
+        """Get more numbers from separate stats page,
+        such as all time plays.
+        
+        return:
+            d_stats (dict): stats
+        """
+
+        boardgame_stats_url = f'{boardgame_url}/stats'
+
+        self.browser.get(boardgame_stats_url)
+        page_content = self.browser.page_source
+
+        d_stats_attributes = self.get_stats_attributes(page_content, game_id)
+
+        return d_stats_attributes
+
+
+    def get_stats_attributes(self, html_text, game_id):
+        """Get statistics attributes from separate page,
+        such as all time plays.
+
+        Input:
+            page_content (str): html
+        Return:
+            dict
+        """
+
+        import bs4
+
+        d = {}
+        soup = bs4.BeautifulSoup(html_text, "lxml")
+
+        #import pdb; pdb.set_trace()
+
+        try:
+            d['all_time_plays'] = soup.findAll("a", {"ng-href" : f"/playstats/thing/{game_id}"})[0].getText().replace(',','')
+        except:
+            d['all_time_plays'] = 'Could not get'
+
+        print(d)
+        return d
 
 
     def get_playstyle(self, soup):
@@ -460,7 +511,8 @@ class BGG:
         df.rename(columns=self.google_sheet_col_names, inplace=True)
         df = df[self.google_sheet_col_order]
 
-        gc = pygsheets.authorize()
+        gc = pygsheets.authorize(outh_file='client_secret_734903773822-0vv2nu579q13i9v236mbl27o317icmij.apps.googleusercontent.com.json')
+        #gc = pygsheets.authorize()
         gsheet_name = datetime.now().strftime("%Y%m%d-%H%M%S")
         sh = gc.create(gsheet_name, parent_id=self.google_drive_folder_id)
         wks = sh.add_worksheet(self.google_worksheet_name,
