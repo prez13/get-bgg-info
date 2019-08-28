@@ -1,3 +1,13 @@
+from selenium import webdriver
+import bs4
+import requests
+import math
+import os
+import pygsheets
+import pandas as pd
+from datetime import datetime
+
+
 class BGG:
 
     # Class Object Attributes
@@ -80,7 +90,7 @@ class BGG:
         self.number_of_games = number_of_games
         print("Initializing instance")
 
-        from selenium import webdriver
+        #from selenium import webdriver
         self.browser = webdriver.Chrome("C:\Program Files (x86)\Chromedriver\chromedriver.exe")
 
 
@@ -88,7 +98,7 @@ class BGG:
         """Returns geek rating, avg rating, and num voters as list
         """
 
-        import bs4
+        #import bs4
 
         tdtags = soup.find_all("td", {"class": "collection_bggrating"})[3*x:3*x+3]
         tdvalues = []
@@ -151,7 +161,7 @@ class BGG:
                 for title and it
         """
 
-        import bs4
+        #import bs4
 
         list_w_titles_ids = []
 
@@ -229,8 +239,8 @@ class BGG:
         Input: number_of_pages (optional) as integer
         Ouput: content (of pages) as string
         """
-        import requests
-        import math
+        #import requests
+        #import math
 
         list_w_titles_ids = []
 
@@ -280,7 +290,7 @@ class BGG:
         """
 
         #from selenium import webdriver
-        import os
+        #import os
 
         # Build abs. from rel. path
         cache_game_pages_abs_path = os.path.join(os.path.abspath(os.path.dirname(__file__)),
@@ -345,7 +355,7 @@ class BGG:
         boardgame_stats_url = f'{boardgame_url}/stats'
 
         self.browser.get(boardgame_stats_url)
-        page_content = self.browser.page_source
+        page_content = self.browser.page_source        
 
         d_stats_attributes = self.get_stats_attributes(page_content, game_id)
 
@@ -362,7 +372,7 @@ class BGG:
             dict
         """
 
-        import bs4
+        #import bs4
 
         d = {}
         soup = bs4.BeautifulSoup(html_text, "lxml")
@@ -411,7 +421,7 @@ class BGG:
         Input: html
         Output: list of dicts"""
 
-        import bs4
+        #import bs4
 
         d = {}
         sep = "–"
@@ -503,9 +513,9 @@ class BGG:
         """Write dict into Google sheet
         """
 
-        import pygsheets
-        import pandas as pd
-        from datetime import datetime
+        #import pygsheets
+        #import pandas as pd
+        #from datetime import datetime
 
         df = pd.DataFrame(d)
         df.rename(columns=self.google_sheet_col_names, inplace=True)
