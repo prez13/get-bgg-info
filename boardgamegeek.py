@@ -53,6 +53,8 @@ class BGG:
                               'price_ios':'Price iOS',
                               'all_time_plays':'Plays all',
                               'fans' : 'Fans',
+                              'all_time_plays_year' : 'Plays year',
+                              'own' : 'Own',
                               }
     google_sheet_col_order = [
         'Rank',
@@ -63,7 +65,9 @@ class BGG:
         'Geek rating',
         'Num voters',
         'Plays all',
+        'Plays year',
         'Fans',
+        'Own',
         'Num pl comm',
         'Num pl comm best',
         'Pl time min',
@@ -334,7 +338,7 @@ class BGG:
             d_attributes.update(game)  # add id, title, and title_url to dict (game is dict, too)
 
             # NEW: get stats (e.g. all time plays)
-            d_stats = self.get_stats(boardgame_url, game['id'])
+            d_stats = self.get_stats(boardgame_url, game['id'], d_attributes['year2'])
             d_attributes.update(d_stats)
 
             l_d.append(d_attributes)
@@ -346,7 +350,7 @@ class BGG:
         return l_d
 
 
-    def get_stats(self, boardgame_url, game_id):
+    def get_stats(self, boardgame_url, game_id, year2):
         """Get more numbers from separate stats page,
         such as all time plays.
         
@@ -359,12 +363,14 @@ class BGG:
         self.browser.get(boardgame_stats_url)
         page_content = self.browser.page_source        
 
-        d_stats_attributes = self.get_stats_attributes(page_content, game_id)
+        game_name = boardgame_url.split('/')[-1]
+
+        d_stats_attributes = self.get_stats_attributes(page_content, game_id, year2, game_name)
 
         return d_stats_attributes
 
 
-    def get_stats_attributes(self, html_text, game_id):
+    def get_stats_attributes(self, html_text, game_id, year2, game_name):
         """Get statistics attributes from separate page,
         such as all time plays.
 
@@ -379,7 +385,7 @@ class BGG:
         d = {}
         soup = bs4.BeautifulSoup(html_text, "lxml")
 
-        import pdb; pdb.set_trace()
+        #import pdb; pdb.set_trace()
 
         # ALl time plays
         try:
@@ -387,11 +393,30 @@ class BGG:
         except:
             d['all_time_plays'] = 'Could not get'
 
+
+        # All time plays, per year
+        year_on_market = datetime.now().year - int(year2)
+        if year_on_market != 0:
+            d['all_time_plays_year'] = int(int(d['all_time_plays']) / year_on_market)
+        else:
+            d['all_time_plays_year'] = 'not old enough'
+
+        #import pdb; pdb.set_trace()
+
         # Fans
         try:
             d['fans'] = soup.findAll("a", {"href" : f"/fans/thing/{game_id}"})[2].getText().replace(",", "")
         except:
             d['fans'] = 'Could not get'
+
+        # Own
+        try:
+            d['own'] = soup.findAll("a", {"href" : f"/boardgame/174430/{game_name}/ratings?status=own"})[0].getText().replace(',','')
+        except:
+            d['own'] = 'Could not get'
+            # soup.findAll("a", {"href":"/boardgame/174430/gloomhaven/ratings?status=own"})[0].getText()
+
+        #import pdb; pdb.set_trace()
 
         print(d)
         return d
@@ -468,11 +493,14 @@ class BGG:
 
         d['players_community'] = players_community
 
+        """
+        # NOT IN USE
         players_community_min = players_community.split(sep)[0]  # 1-2 or 2
 
         players_community_max = players_community_min
         if "–" in players_community:
             players_community_max = players_community.split("–")[1]
+        """
 
         try:
             d['players_community_best'] = \
@@ -514,6 +542,8 @@ class BGG:
         d[self.class_name_mechanism.lower()] = d_classifications.get(self.class_name_mechanism, "None")
         d[self.class_name_family.lower()] = d_classifications.get(self.class_name_family, "None")
 
+        d['year2'] = soup.findAll("span", {'ng-if' : 'geekitemctrl.geekitem.data.item.yearpublished && geekitemctrl.geekitem.data.item.yearpublished !=="0"'})[0].getText().replace("(", "").replace(")", "").strip()
+
         print(d)
         return d
 
@@ -531,7 +561,7 @@ class BGG:
         df = df[self.google_sheet_col_order]
 
         gc = pygsheets.authorize(outh_file='client_secret_734903773822-0vv2nu579q13i9v236mbl27o317icmij.apps.googleusercontent.com.json')
-        #gc = pygsheets.authorize()
+        #gc = pygsheets.authorize()  # previously
         gsheet_name = datetime.now().strftime("%Y%m%d-%H%M%S")
         sh = gc.create(gsheet_name, parent_id=self.google_drive_folder_id)
         wks = sh.add_worksheet(self.google_worksheet_name,
