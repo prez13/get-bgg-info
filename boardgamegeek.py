@@ -411,7 +411,7 @@ class BGG:
 
         # Own
         try:
-            d['own'] = soup.findAll("a", {"href" : f"/boardgame/174430/{game_name}/ratings?status=own"})[0].getText().replace(',','')
+            d['own'] = soup.findAll("a", {"href" : f"/boardgame/{game_id}/{game_name}/ratings?status=own"})[0].getText().replace(',','')
         except:
             d['own'] = 'Could not get'
             # soup.findAll("a", {"href":"/boardgame/174430/gloomhaven/ratings?status=own"})[0].getText()
