@@ -125,7 +125,6 @@ class BGG:
 
             try:
                 d['price_list'] = el.get_attribute("innerHTML").split("List:&nbsp;")[1].split('\n\t\t')[0]
-                #print("YAY price list!")
             except:
                 d['price_list'] = ''
                 #pass
@@ -133,18 +132,14 @@ class BGG:
             try:
                 d['price_amazon_lowest'] = el.get_attribute("innerHTML").split('Lowest Amazon:&nbsp;<span class="positive">')[1].split(
                     '</span>')[0]
-                #print("YAY lowest amazon list!")
             except:
                 d['price_amazon_lowest'] = ''
-                #pass
 
             try:
                 d['price_amazon_new'] = el.get_attribute("innerHTML").split('New Amazon:&nbsp;<span class="positive">')[1].split(
                     '</span>')[0]
-                #print("YAY amazon new!")
             except:
                 d['price_amazon_newest'] = ''
-                #pass
 
             try:
                 d['price_ios'] = el.get_attribute("innerHTML").split('iOS App: <span class="positive">')[1].split('</span>')[0]
@@ -172,8 +167,6 @@ class BGG:
         list_w_titles_ids = []
 
         soup = bs4.BeautifulSoup(content, "lxml")
-        #print(soup)
-        #print(content)
 
         prices = self.get_prices(browser)
         print(prices)
@@ -183,25 +176,22 @@ class BGG:
 
             d = {}
             css_id = 'results_objectname{}'.format(x)
-            # print(css_id)
             print(x)
 
             # Get relevant html section for a game
             results = soup.select('#{}'.format(css_id))
-            #print("-------------------------------")
-            #print(results)
+        
             """
             [<div id="results_objectname66" onclick="" style="z-index:1000;">
 <a href="/boardgame/150376/dead-winter-crossroads-game">Dead of Winter: A Crossroads Game</a>
 <span class="smallerfont dull">(2014)</span>
 </div>]
             """
-            #print("-------------------------------")
+
             if len(results) == 0:
                 # Means we went through all the 100 games on the page
                 break
             results2 = results[0].select('a')
-            # print(results2)
 
             # Get title, title_url, and id
             title = results2[0].getText()
@@ -218,12 +208,6 @@ class BGG:
                 d['avg_rating'],
                 d['num_voters']
             ) = self.get_bggratings(soup, x-1)
-
-            #(
-            #    d['price_list'],
-            #    d['price_amazon_lowest'],
-            #    d['price_amazon_new'],
-            #) = prices[x-1]
 
             d['title'] = title
             d['title_url'] = title_url
@@ -280,7 +264,6 @@ class BGG:
 
     def read_content_from_file(self, filename=browse_pages_filename):
         """Read browse games pages content from file"""
-        # content = ''
 
         with open(filename, 'rb') as f:
             content = f.read()
@@ -304,7 +287,6 @@ class BGG:
         print(cache_game_pages_abs_path)
 
         l_d = []
-        #browser = webdriver.Chrome("C:\Program Files (x86)\Chromedriver\chromedriver.exe")
         counter = 0
 
         for game in list_games:
@@ -385,8 +367,6 @@ class BGG:
         d = {}
         soup = bs4.BeautifulSoup(html_text, "lxml")
 
-        #import pdb; pdb.set_trace()
-
         # ALl time plays
         try:
             d['all_time_plays'] = soup.findAll("a", {"ng-href" : f"/playstats/thing/{game_id}"})[0].getText().replace(',','')
@@ -401,8 +381,6 @@ class BGG:
         else:
             d['all_time_plays_year'] = 'not old enough'
 
-        #import pdb; pdb.set_trace()
-
         # Fans
         try:
             d['fans'] = soup.findAll("a", {"href" : f"/fans/thing/{game_id}"})[2].getText().replace(",", "")
@@ -414,9 +392,6 @@ class BGG:
             d['own'] = soup.findAll("a", {"href" : f"/boardgame/{game_id}/{game_name}/ratings?status=own"})[0].getText().replace(',','')
         except:
             d['own'] = 'Could not get'
-            # soup.findAll("a", {"href":"/boardgame/174430/gloomhaven/ratings?status=own"})[0].getText()
-
-        #import pdb; pdb.set_trace()
 
         print(d)
         return d
@@ -492,15 +467,6 @@ class BGG:
             players_community = players_community_list[0]
 
         d['players_community'] = players_community
-
-        """
-        # NOT IN USE
-        players_community_min = players_community.split(sep)[0]  # 1-2 or 2
-
-        players_community_max = players_community_min
-        if "–" in players_community:
-            players_community_max = players_community.split("–")[1]
-        """
 
         try:
             d['players_community_best'] = \
