@@ -371,7 +371,7 @@ class BGG:
         try:
             d['all_time_plays'] = soup.findAll("a", {"ng-href" : f"/playstats/thing/{game_id}"})[0].getText().replace(',','')
         except:
-            d['all_time_plays'] = 'Could not get'
+            d['all_time_plays'] = 0  # 0 since 'Could not get' can lead to error in int() below
 
 
         # All time plays, per year
