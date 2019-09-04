@@ -508,7 +508,10 @@ class BGG:
         d[self.class_name_mechanism.lower()] = d_classifications.get(self.class_name_mechanism, "None")
         d[self.class_name_family.lower()] = d_classifications.get(self.class_name_family, "None")
 
-        d['year2'] = soup.findAll("span", {'ng-if' : 'geekitemctrl.geekitem.data.item.yearpublished && geekitemctrl.geekitem.data.item.yearpublished !=="0"'})[0].getText().replace("(", "").replace(")", "").strip()
+        try:
+            d['year2'] = soup.findAll("span", {'ng-if' : 'geekitemctrl.geekitem.data.item.yearpublished && geekitemctrl.geekitem.data.item.yearpublished !=="0"'})[0].getText().replace("(", "").replace(")", "").strip()
+        except:
+            d['year2'] = '0'
 
         print(d)
         return d
