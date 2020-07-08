@@ -438,14 +438,14 @@ class BGG:
 
         try:
             d['age'] = soup.findAll("span",
-                               {"ng-if": "::geekitemctrl.geekitem.data.item.minage > 0"})[0].getText().split()[0][:-1]  # everything except last item (+ sign, e.g. 14+)
+                               {"ng-if": "::geekitemctrl.geekitem.data.item.minage > 0"})[0].getText().split()[0].replace('+','') 
         except:
             d['age'] = ''
 
         try:
             d['age_community'] = \
             soup.findAll("span",
-                         {"ng-bind-html": "geekitemctrl.geekitem.data.item.polls.playerage|to_trusted"})[0].getText()
+                         {"ng-bind-html": "geekitemctrl.geekitem.data.item.polls.playerage|to_trusted"})[0].getText().replace('+','')
         except:
             d['age_community'] = ''
 
