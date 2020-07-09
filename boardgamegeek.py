@@ -402,7 +402,7 @@ class BGG:
         bs4 already needs to be imported."""
 
         r = soup.find("ul", class_="features")
-        if "operative Play" in str(r):
+        if "operative Game" in str(r):
             return "Co-operative"
         else:
             return "Competitive"
