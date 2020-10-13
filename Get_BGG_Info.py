@@ -21,7 +21,7 @@ def main():
 
     # Create instance of the BGG class,
     # with the top number of games to be processed
-    bgg = boardgamegeek.BGG(100)
+    bgg = boardgamegeek.BGG(1000)
 
     # Get games and attribute info from browse pages
     l_d_games_browse_pages = bgg.scrape_browse_pages()
